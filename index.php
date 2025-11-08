@@ -1,3 +1,6 @@
+<?php include __DIR__.'/db_manip.php'; 
+
+?> 
 <!DOCTYPE html>
 <html>
 <head>
@@ -7,7 +10,7 @@
 </head>
 <body>
 		<?php
-			
+			dbConnect();	
 		?>
 </body>
 </html>
