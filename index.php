@@ -1,4 +1,7 @@
-<?php include __DIR__.'/db_manip.php'; 
+<?php
+	use ReallySimpleJWT\Token;
+	include __DIR__.'/db_manip.php'; 
+	dbConnect();
 
 ?> 
 <!DOCTYPE html>
@@ -10,7 +13,10 @@
 </head>
 <body>
 		<?php
-			dbConnect();	
+
 		?>
+		<form methdo="GET">
+			<input type="text" name="login">
+		</form>
 </body>
 </html>
