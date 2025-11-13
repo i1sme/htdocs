@@ -1,0 +1,386 @@
+openapi: 3.0.0
+info:
+  title: Arseniis(mein hehe) API
+  description: description(I guess)
+  version: 1.3.3.7.
+
+servers:
+  - url: http://localhost
+
+paths:
+  /auth.php:
+    post:
+      summary: Authenticate user
+      description: Get JWT token for API access using username and password
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+              properties:
+                username:
+                  type: string
+                  example: notRealAnwar
+                password:
+                  type: string
+                  example: password
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  token:
+                    type: string
+                  expires_in:
+                    type: integer
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      username:
+                        type: string
+        '400':
+          description: Missing username or password
+        '401':
+          description: Invalid credentials
+
+  /products:
+    get:
+      summary: Get all products
+      tags:
+        - Products
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of products retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        '401':
+          description: Unauthorized - Invalid or missing token
+    post:
+      summary: Create a new product
+      tags:
+        - Products
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductInput'
+      responses:
+        '201':
+          description: Product created successfully
+        '400':
+          description: Invalid input or SKU already exists
+        '401':
+          description: Unauthorized
+
+  /products/{id}:
+    get:
+      summary: Get product by ID
+      tags:
+        - Products
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Product ID
+      responses:
+        '200':
+          description: Product details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: Product not found
+        '401':
+          description: Unauthorized
+    put:
+      summary: Update product
+      tags:
+        - Products
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductInput'
+      responses:
+        '200':
+          description: Product updated successfully
+        '400':
+          description: Invalid input
+        '404':
+          description: Product not found
+        '401':
+          description: Unauthorized
+    delete:
+      summary: Delete product
+      tags:
+        - Products
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Product deleted successfully
+        '404':
+          description: Product not found
+        '401':
+          description: Unauthorized
+
+  /categories:
+    get:
+      summary: Get all categories
+      tags:
+        - Categories
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of categories retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+        '401':
+          description: Unauthorized
+    post:
+      summary: Create a new category
+      tags:
+        - Categories
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryInput'
+      responses:
+        '201':
+          description: Category created successfully
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+
+  /categories/{id}:
+    get:
+      summary: Get category by ID
+      tags:
+        - Categories
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Category details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        '404':
+          description: Category not found
+        '401':
+          description: Unauthorized
+    put:
+      summary: Update category
+      tags:
+        - Categories
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryInput'
+      responses:
+        '200':
+          description: Category updated successfully
+        '400':
+          description: Invalid input
+        '404':
+          description: Category not found
+        '401':
+          description: Unauthorized
+    delete:
+      summary: Delete category
+      tags:
+        - Categories
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Category deleted successfully
+        '400':
+          description: Cannot delete category with associated products
+        '404':
+          description: Category not found
+        '401':
+          description: Unauthorized
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Product:
+      type: object
+      properties:
+        product_id:
+          type: integer
+          example: 1
+        sku:
+          type: string
+          example: "SKU001"
+        active:
+          type: boolean
+          example: true
+        id_category:
+          type: integer
+          nullable: true
+          example: 1
+        name:
+          type: string
+          example: "Laptop"
+        image:
+          type: string
+          example: "https://anywebseite.com/imagee.png"
+        description:
+          type: string
+          example: "High-performance laptop"
+        price:
+          type: number
+          format: float
+          example: 999.99
+        stock:
+          type: integer
+          example: 10
+        category_name:
+          type: string
+          example: "Electronics"
+
+    ProductInput:
+      type: object
+      required:
+        - sku
+        - name
+        - price
+        - stock
+      properties:
+        sku:
+          type: string
+          example: "SKU001"
+        name:
+          type: string
+          example: "Laptop"
+        price:
+          type: number
+          format: float
+          example: 999.99
+        stock:
+          type: integer
+          example: 10
+        active:
+          type: boolean
+          example: true
+        id_category:
+          type: integer
+          nullable: true
+          example: 1
+        image:
+          type: string
+          example: "https://anywebseite.com/imagee.png"
+        description:
+          type: string
+          example: "High-performance laptop"
+
+    Category:
+      type: object
+      properties:
+        category_id:
+          type: integer
+          example: 1
+        active:
+          type: boolean
+          example: true
+        name:
+          type: string
+          example: "Electronics"
+
+    CategoryInput:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: "Electronics"
+        active:
+          type: boolean
+          example: true
+
+security:
+  - bearerAuth: []
+
